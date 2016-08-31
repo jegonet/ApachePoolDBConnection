@@ -1,0 +1,6 @@
+{
+    "hostPath": "//localhost:5432/swii",
+    "user": "postgres",
+    "password": "1234",
+    "ssl": "true"
+}

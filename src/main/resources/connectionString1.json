@@ -1,0 +1,6 @@
+{
+    "hostPath": "//localhost:5555/swii",
+    "user": "swii",
+    "password": "swii",
+    "ssl": "true"
+}
