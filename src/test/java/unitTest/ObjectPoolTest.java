@@ -7,6 +7,7 @@ package unitTest;
  */
 
 import co.edo.uelbosque.apachepool.ui.Programa;
+import java.util.Random;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -23,24 +24,27 @@ public class ObjectPoolTest {
     public ObjectPoolTest() {
     }
 
-    @Test
+    @Test(invocationCount = 5, threadPoolSize = 5)
     public void conexionesLimite5Valido() {
-         Assert.assertTrue(Programa.insertarResgistro(1, "Prueba"));
+        int idRandom = new Random().nextInt(10000 - 2000 + 1) + 2000;
+        Assert.assertTrue(Programa.insertarResgistro("Prueba" + String.valueOf(idRandom)));
     }
     
-    @Test
+    @Test(invocationCount = 6, threadPoolSize = 6)
     public void conexionesLimite6Invalido(){
-        Assert.assertTrue(Programa.insertarResgistro(1, "Prueba"));
+        int idRandom = new Random().nextInt(10000 - 2000 + 1) + 2000;
+        Assert.assertTrue(Programa.insertarResgistro("Prueba" + String.valueOf(idRandom)));
     }
     
     @Test
-    public void crear10000RegistrosValido(){
+    public void crear1000RegistrosValido(){
         
         boolean resultadoPrueba = true;
         
-        for(int i=0; i<10000; i++) {
-            resultadoPrueba = resultadoPrueba || Programa.insertarResgistro(i, 
-                    "nombre" + String.valueOf(i));
+        for(int i=0; i<1000; i++) {
+            
+            boolean resultadoOperacion = Programa.insertarResgistro("nombre" + String.valueOf(i));
+            resultadoPrueba = resultadoPrueba || resultadoOperacion;
         }
         
         Assert.assertTrue(resultadoPrueba);
@@ -48,19 +52,26 @@ public class ObjectPoolTest {
     
     @BeforeClass
     public static void setUpClass() {
+        Programa.crearPoolConexiones();
+        Programa.crearTabla();
     }
 
     @AfterClass
     public static void tearDownClass() {
-    }
-
-    @BeforeMethod
-    public void setUpMethod() {
-        Programa.inicializar();
-    }
-
-    @AfterMethod
-    public void tearDownMethod() throws Exception {
         Programa.borrarTabla();
+        Programa.cerrarPoolConexiones();       
+    }
+
+    @BeforeMethod(firstTimeOnly = true)
+    public void setUpMethod() {
+        
+    }
+
+    @AfterMethod(lastTimeOnly = true)
+    public void tearDownMethod() throws Exception {
+        System.out.println("Médoto terminado para debug de pool:");
+        System.out.println(Programa.getPoolBasesDatos().getNumIdle());
+        System.out.println(Programa.getPoolBasesDatos().getBorrowedCount());
+        System.out.println(Programa.getPoolBasesDatos().getCreatedCount());
     }
 }

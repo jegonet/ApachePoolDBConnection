@@ -39,11 +39,11 @@ public class ManejadorBaseDatos {
         if(conn == null || !conn.isValid(5000) || conn.isClosed())
             conn = DriverManager.getConnection(dbPathServer, props);
         
+        conn.setAutoCommit(true);
         return conn;
     }
     
     public ResultSet consultar(String consulta) throws SQLException {
-        
         Connection conn = getConexionActual();
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(consulta);
@@ -52,9 +52,7 @@ public class ManejadorBaseDatos {
     }
 
     public void ejecutarSentencia(String sentencia) throws SQLException {
-        
-        conn = DriverManager.getConnection(dbPathServer, props);
-
+        Connection conn = getConexionActual();
         Statement st = conn.createStatement();
         st.executeUpdate(sentencia);
     }

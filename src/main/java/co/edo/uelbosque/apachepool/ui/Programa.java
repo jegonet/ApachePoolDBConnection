@@ -5,7 +5,6 @@
  */
 package co.edo.uelbosque.apachepool.ui;
 
-import co.edo.uelbosque.apachepool.dao.ManejadorBaseDatos;
 import co.edo.uelbosque.apachepool.dao.TablaPrueba;
 import co.edo.uelbosque.apachepool.dao.pool.BDPool;
 import co.edo.uelbosque.apachepool.dao.pool.BDPoolFactory;
@@ -20,7 +19,7 @@ public class Programa {
     
     private static BDPool poolBasesDatos;
     
-    private static void crearPoolConexiones(){
+    public static void crearPoolConexiones(){
         
         GenericObjectPoolConfig configPool = new GenericObjectPoolConfig();
         configPool.setMaxIdle(1);
@@ -32,13 +31,10 @@ public class Programa {
         poolBasesDatos = new BDPool(new BDPoolFactory(), configPool);
     }
     
-    public static boolean inicializar(){
-
-        crearPoolConexiones();
+    public static boolean crearTabla(){
         
         try { 
-            ManejadorBaseDatos oBaseDatos = poolBasesDatos.borrowObject();
-            TablaPrueba.crearTabla(oBaseDatos);
+            TablaPrueba.crearTabla(poolBasesDatos);
         }
         catch(Exception ex) {
             ManejadorMensajes.mostrarError(ex);
@@ -47,11 +43,10 @@ public class Programa {
         return true;
     }
     
-    public static boolean insertarResgistro(long id, String name){
+    public static boolean insertarResgistro(String name) {
         
         try { 
-            ManejadorBaseDatos oBaseDatos = poolBasesDatos.borrowObject();
-            TablaPrueba.insertarDato(oBaseDatos, id, name);
+            TablaPrueba.insertarDato(poolBasesDatos, name);
         }
         catch(Exception ex) {
             ManejadorMensajes.mostrarError(ex);
@@ -63,13 +58,21 @@ public class Programa {
     public static boolean borrarTabla(){
         
         try { 
-            ManejadorBaseDatos oBaseDatos = poolBasesDatos.borrowObject();
-            TablaPrueba.eliminarTabla(oBaseDatos);
+            TablaPrueba.eliminarTabla(poolBasesDatos);
         }
         catch(Exception ex) {
             ManejadorMensajes.mostrarError(ex);
             return false;
         }
         return true;
+    }
+    
+    public static void cerrarPoolConexiones(){
+        poolBasesDatos.clear();
+        poolBasesDatos.close();
+    }
+    
+    public static BDPool getPoolBasesDatos(){
+        return poolBasesDatos;
     }
 }

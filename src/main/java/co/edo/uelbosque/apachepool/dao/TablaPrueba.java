@@ -5,23 +5,58 @@
  */
 package co.edo.uelbosque.apachepool.dao;
 
-import java.sql.SQLException;
+import co.edo.uelbosque.apachepool.dao.pool.BDPool;
 
 /**
  
  * @author Jorge Eliecer Gantiva Ochoa
  */
 public class TablaPrueba {
-    public static void crearTabla(ManejadorBaseDatos oBaseDatos) throws SQLException{
-        oBaseDatos.ejecutarSentencia("CREATE TABLE table1(id BIGINT NOT NULL, name VARCHAR(30) NOT NULL, CONSTRAINT pk_table1 PRIMARY KEY (id));");
+    public static void crearTabla(BDPool poolBasesDatos) throws Exception{
+        
+        ManejadorBaseDatos oBaseDatos = null;
+        try { 
+            oBaseDatos = poolBasesDatos.borrowObject();
+            oBaseDatos.ejecutarSentencia("CREATE TABLE table1(id SERIAL, name VARCHAR(30) NOT NULL);");
+        }
+        catch(Exception ex) {
+            throw ex;
+        }
+        finally {
+            if(oBaseDatos!=null)
+                poolBasesDatos.returnObject(oBaseDatos);
+        }
     }
     
-    public static void eliminarTabla(ManejadorBaseDatos oBaseDatos) throws SQLException{
-        oBaseDatos.ejecutarSentencia("DROP TABLE table1;");
+    public static void eliminarTabla(BDPool poolBasesDatos) throws Exception{
+        
+        ManejadorBaseDatos oBaseDatos = null;
+        try { 
+            oBaseDatos = poolBasesDatos.borrowObject();
+            oBaseDatos.ejecutarSentencia("DROP TABLE table1;");
+        }
+        catch(Exception ex) {
+            throw ex;
+        }
+        finally {
+            if(oBaseDatos!=null)
+                poolBasesDatos.returnObject(oBaseDatos);
+        }
     }
     
-    public static void insertarDato(ManejadorBaseDatos oBaseDatos, long id, String name) throws SQLException{
-        oBaseDatos.ejecutarSentencia("INSERT INTO table1(id, name) VALUES (" + 
-                String.valueOf(id) + ", '" + name +"');");
+    public static void insertarDato(BDPool poolBasesDatos, String name) throws Exception{
+        
+        ManejadorBaseDatos oBaseDatos = null;
+        try { 
+            oBaseDatos = poolBasesDatos.borrowObject();
+            oBaseDatos.ejecutarSentencia("INSERT INTO table1(name) VALUES ('" + name +"');");
+        }
+        catch(Exception ex) {
+            throw ex;
+        }
+        finally {
+            if(oBaseDatos!=null)
+                poolBasesDatos.returnObject(oBaseDatos);
+        }
     }
 }
