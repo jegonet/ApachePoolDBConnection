@@ -25,13 +25,13 @@ public class ObjectPoolTest {
     }
 
     @Test(invocationCount = 5, threadPoolSize = 5)
-    public void conexionesLimite5Valido() {
+    public void conexionesLimite5() {
         int idRandom = new Random().nextInt(10000 - 2000 + 1) + 2000;
         Assert.assertTrue(Programa.insertarResgistro("Prueba" + String.valueOf(idRandom)));
     }
     
-    @Test(invocationCount = 6, threadPoolSize = 6)
-    public void conexionesLimite6Invalido(){
+    @Test(invocationCount = 10, threadPoolSize = 10)
+    public void conexionesLimite10(){
         int idRandom = new Random().nextInt(10000 - 2000 + 1) + 2000;
         Assert.assertTrue(Programa.insertarResgistro("Prueba" + String.valueOf(idRandom)));
     }
@@ -42,7 +42,6 @@ public class ObjectPoolTest {
         boolean resultadoPrueba = true;
         
         for(int i=0; i<1000; i++) {
-            
             boolean resultadoOperacion = Programa.insertarResgistro("nombre" + String.valueOf(i));
             resultadoPrueba = resultadoPrueba || resultadoOperacion;
         }

@@ -15,8 +15,8 @@ import org.json.JSONObject;
  * @author Jorge Eliecer Gantiva Ochoa
  */
 public class ManejadorBaseDatos {
-    private final String dbPathServer;
-    private final Properties props;
+    private String dbPathServer;
+    private Properties props;
     private Connection conn;
 
     public ManejadorBaseDatos() throws Exception {
@@ -32,34 +32,32 @@ public class ManejadorBaseDatos {
         if(json.getString("ssl").equals("true"))
             props.setProperty("ssl", json.getString("ssl"));
        
-        conn = getConexionActual();
+        conn = DriverManager.getConnection(dbPathServer, props);
     }
-    
-    private Connection getConexionActual() throws SQLException {
-        if(conn == null || !conn.isValid(5000) || conn.isClosed())
-            conn = DriverManager.getConnection(dbPathServer, props);
         
-        conn.setAutoCommit(true);
-        return conn;
-    }
-    
     public ResultSet consultar(String consulta) throws SQLException {
-        Connection conn = getConexionActual();
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(consulta);
-
         return rs;
     }
 
     public void ejecutarSentencia(String sentencia) throws SQLException {
-        Connection conn = getConexionActual();
         Statement st = conn.createStatement();
         st.executeUpdate(sentencia);
     }
     
-    public void cerrarConexionActual() throws SQLException {
-        if(conn != null)
+    public void destruirConexion() {
+        try{
             conn.close();
+        }
+        catch(Exception e){
+            //Es posible que la conexion ya este cerrada
+        }    
+        finally{
+            conn = null;
+            props = null;
+            dbPathServer = null;
+        }   
     }
 
     public static String limpiarParametro(String valor) {

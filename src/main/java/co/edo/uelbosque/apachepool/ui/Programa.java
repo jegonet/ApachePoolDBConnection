@@ -26,7 +26,7 @@ public class Programa {
         configPool.setMaxTotal(5);
         
         configPool.setTestOnBorrow(true);
-        configPool.setTestOnReturn(true);
+        configPool.setTestOnReturn(false);
         
         poolBasesDatos = new BDPool(new BDPoolFactory(), configPool);
     }

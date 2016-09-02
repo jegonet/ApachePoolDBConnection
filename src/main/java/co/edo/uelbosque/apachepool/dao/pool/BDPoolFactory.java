@@ -25,4 +25,32 @@ public class BDPoolFactory extends BasePooledObjectFactory<ManejadorBaseDatos> {
     public PooledObject<ManejadorBaseDatos> wrap(ManejadorBaseDatos t) {
         return new DefaultPooledObject<ManejadorBaseDatos>(t);
     }   
+    
+    @Override
+    public boolean validateObject(PooledObject<ManejadorBaseDatos> oBaseDatosPooled){
+        try{
+            oBaseDatosPooled.getObject().consultar("SELECT 1;");
+            //La conexion funciona!
+            return true;
+        }
+        catch(Exception ex){
+            //La conexión está caida, sacar la conexión del pool
+            return false;
+        }
+    }
+    
+    @Override
+    public void destroyObject(PooledObject<ManejadorBaseDatos> oBaseDatosPooled){
+        oBaseDatosPooled.getObject().destruirConexion();
+        oBaseDatosPooled.deallocate();
+        
+        try{
+            super.destroyObject(oBaseDatosPooled);
+        }
+        catch(Exception ex){
+            //Se realiza la eliminación normal
+        }
+        
+        oBaseDatosPooled = null;
+    }
 }
