@@ -6,6 +6,8 @@ package unitTest;
  * and open the template in the editor.
  */
 
+import co.edo.uelbosque.apachepool.dao.ManejadorBaseDatos;
+import co.edo.uelbosque.apachepool.dao.pool.BDPool;
 import co.edo.uelbosque.apachepool.ui.Programa;
 import java.util.Random;
 import org.testng.Assert;
@@ -47,23 +49,48 @@ public class ObjectPoolTest {
         }
         
         Assert.assertTrue(resultadoPrueba);
+        Assert.assertEquals(Programa.getPoolBasesDatos().getCreatedCount(), 1); //solo debe crear una conexion
     }
     
-    @BeforeClass
-    public static void setUpClass() {
-        Programa.crearPoolConexiones();
-        Programa.crearTabla();
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-        Programa.borrarTabla();
-        Programa.cerrarPoolConexiones();       
+    @Test
+    public void validarLimpiezaPool() throws Exception{
+        
+        BDPool pool = Programa.getPoolBasesDatos();
+        ManejadorBaseDatos oBaseDatos = null;
+        try { 
+            oBaseDatos = pool.borrowObject();
+            oBaseDatos.consultar("SELECT 1;");
+            
+            oBaseDatos.destruirConexion();
+        }
+        catch(Exception ex) {
+            throw ex;
+        }
+        finally {
+            if(oBaseDatos!=null)
+                pool.returnObject(oBaseDatos);
+        }
+        
+        try { 
+            oBaseDatos = pool.borrowObject();
+            oBaseDatos.consultar("SELECT 1;");
+        }
+        catch(Exception ex) {
+            throw ex;
+        }
+        finally {
+            if(oBaseDatos!=null)
+                pool.returnObject(oBaseDatos);
+        }
+        
+        Assert.assertEquals(pool.getDestroyedCount(), 1); //debe destruir una conexion dañada
+        Assert.assertEquals(pool.getCreatedCount(), 2); //debió crear dos conexiones, debido a que la primera fue dañana
     }
 
     @BeforeMethod(firstTimeOnly = true)
     public void setUpMethod() {
-        
+        Programa.crearPoolConexiones();
+        Programa.crearTabla();
     }
 
     @AfterMethod(lastTimeOnly = true)
@@ -72,5 +99,16 @@ public class ObjectPoolTest {
         System.out.println(Programa.getPoolBasesDatos().getNumIdle());
         System.out.println(Programa.getPoolBasesDatos().getBorrowedCount());
         System.out.println(Programa.getPoolBasesDatos().getCreatedCount());
+        
+        Programa.borrarTabla();
+        Programa.cerrarPoolConexiones();  
+    }
+    
+    @BeforeClass
+    public static void setUpClass() {
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
     }
 }

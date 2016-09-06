@@ -17,7 +17,7 @@ public class TablaPrueba {
         ManejadorBaseDatos oBaseDatos = null;
         try { 
             oBaseDatos = poolBasesDatos.borrowObject();
-            oBaseDatos.ejecutarSentencia("CREATE TABLE table1(id SERIAL, name VARCHAR(30) NOT NULL);");
+            oBaseDatos.ejecutarSentencia("CREATE TABLE IF NOT EXISTS table1(id SERIAL, name VARCHAR(30) NOT NULL);");
         }
         catch(Exception ex) {
             throw ex;
